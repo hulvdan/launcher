@@ -39,6 +39,6 @@ a = iterfzf(all_paths)
 
 if a is not None:
     directory = os.path.expanduser(a)
-    command = "neovide.exe ."
+    command = "start neovide.exe ."
     print(directory, command)
-    subprocess.call(command, cwd=directory)
+    subprocess.call(command, cwd=directory, shell=True)
