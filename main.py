@@ -5,7 +5,9 @@ from glob import glob
 from iterfzf import iterfzf
 
 
-paths = [
+HOME_PATH = os.path.expanduser(os.path.normpath("~/"))
+
+PATHS = [
     "~/Downloads/",
     "~/dev/",
     "~/dev/*/",
@@ -16,29 +18,44 @@ paths = [
 ]
 
 
-home_path = os.path.expanduser(os.path.normpath("~/"))
+def main() -> None:
+    all_paths = []
 
-all_paths = []
+    for p in PATHS:
+        p = os.path.normpath(p)
+        p = os.path.expanduser(p)
+        if "*" in p:
+            all_paths.extend(
+                "~" + i.removeprefix(HOME_PATH)
+                for i in glob(p, recursive=True, include_hidden=True)
+            )
+        else:
+            p = "~" + p.removeprefix(HOME_PATH)
+            all_paths.append(p)
 
+    selected_path = iterfzf(sorted(all_paths))
+    if selected_path is None:
+        return
 
-for p in paths:
-    p = os.path.normpath(p)
-    p = os.path.expanduser(p)
-    if "*" in p:
-        all_paths.extend(
-            "~" + i.removeprefix(home_path) for i in
-            glob(p, recursive=True, include_hidden=True)
+    directory = os.path.expanduser(selected_path)
+
+    # command = 'cmd /C "nvim ."'
+    # command = "wt.exe /F nvim ."
+    # command = "nvim-qt ."
+    command = 'start alacritty.exe -e "nvim ."'
+    # command = 'start neovide.exe .'
+
+    is_cpp = "cmakelists.txt" in (i.lower() for i in os.listdir(directory))
+    print("IS_CPP={}".format(is_cpp))
+    if is_cpp:
+        command = (
+            r'call "c:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64 &&'
+            + command
         )
-    else:
-        p = "~" + p.removeprefix(home_path)
-        all_paths.append(p)
 
-all_paths.sort()
-
-a = iterfzf(all_paths)
-
-if a is not None:
-    directory = os.path.expanduser(a)
-    command = "start neovide.exe ."
     print(directory, command)
     subprocess.call(command, cwd=directory, shell=True)
+
+
+if __name__ == "__main__":
+    main()
