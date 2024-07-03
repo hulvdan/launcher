@@ -38,12 +38,7 @@ def main() -> None:
         return
 
     directory = os.path.expanduser(selected_path)
-
-    # command = 'cmd /C "nvim ."'
-    # command = "wt.exe /F nvim ."
-    # command = "nvim-qt ."
-    command = 'start alacritty.exe -e "nvim ."'
-    # command = 'start neovide.exe .'
+    command = "start alacritty.exe -e nvim ."
 
     is_cpp = "cmakelists.txt" in (i.lower() for i in os.listdir(directory))
     print("IS_CPP={}".format(is_cpp))
