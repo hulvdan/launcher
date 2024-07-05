@@ -1,5 +1,10 @@
 import os
 import subprocess
+
+from win32 import win32api
+from win32 import win32process
+from win32 import win32gui
+
 from glob import glob
 
 from iterfzf import iterfzf
@@ -38,7 +43,8 @@ def main() -> None:
         return
 
     directory = os.path.expanduser(selected_path)
-    command = "start alacritty.exe -e nvim ."
+    # command = "start alacritty.exe -e nvim ."
+    command = 'wezterm.exe start --cwd {} -e nvim .'.format(directory)
 
     is_cpp = "cmakelists.txt" in (i.lower() for i in os.listdir(directory))
     print("IS_CPP={}".format(is_cpp))
@@ -48,8 +54,21 @@ def main() -> None:
             + command
         )
 
+    def callback(hwnd, pid):
+        if win32process.GetWindowThreadProcessId(hwnd)[1] == pid:
+            # hide window
+            win32gui.ShowWindow(hwnd, 0)
+
+    win32gui.EnumWindows(callback, os.getppid())
+
     print(directory, command)
-    subprocess.call(command, cwd=directory, shell=True)
+    subprocess.Popen(
+        command,
+        shell=True,
+        start_new_session=False,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.STDOUT
+    )
 
 
 if __name__ == "__main__":

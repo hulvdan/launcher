@@ -7,6 +7,7 @@ authors = ["Aleksei Chistov <aleksey.chistov@gmail.com>"]
 [tool.poetry.dependencies]
 python = "^3.11"
 iterfzf = "^1.4.0.51.0"
+pywin32 = "^306"
 
 [build-system]
 requires = ["poetry-core"]
