@@ -43,8 +43,7 @@ def main() -> None:
         return
 
     directory = os.path.expanduser(selected_path)
-    # command = "start alacritty.exe -e nvim ."
-    command = 'wezterm.exe start --cwd {} -e nvim .'.format(directory)
+    command = 'wezterm.exe start --cwd "{}" -- nvim .'.format(directory)
 
     is_cpp = "cmakelists.txt" in (i.lower() for i in os.listdir(directory))
     print("IS_CPP={}".format(is_cpp))
@@ -56,7 +55,6 @@ def main() -> None:
 
     def callback(hwnd, pid):
         if win32process.GetWindowThreadProcessId(hwnd)[1] == pid:
-            # hide window
             win32gui.ShowWindow(hwnd, 0)
 
     win32gui.EnumWindows(callback, os.getppid())
