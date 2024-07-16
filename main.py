@@ -43,15 +43,28 @@ def main() -> None:
         return
 
     directory = os.path.expanduser(selected_path)
-    command = 'wezterm.exe start --cwd "{}" -- nvim .'.format(directory)
+    command = 'wezterm.exe start --cwd "{}" -- '.format(directory)
+
+    cmd = "nvim ."
 
     is_cpp = "cmakelists.txt" in (i.lower() for i in os.listdir(directory))
     print("IS_CPP={}".format(is_cpp))
     if is_cpp:
-        command = (
-            r'call "c:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64 &&'
-            + command
-        )
+        d = os.path.join(directory, "globalignore")
+        if not os.path.exists(d):
+            os.mkdir(d)
+
+        script_file_path = os.path.join(d, ".wezterm.temp.bat")
+        with open(script_file_path, "w") as out_file:
+            out_file.write(
+                r"""
+call "c:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
+nvim ."""
+            )
+
+        cmd = 'cmd /C "{}"'.format(script_file_path)
+
+    command += cmd
 
     def callback(hwnd, pid):
         if win32process.GetWindowThreadProcessId(hwnd)[1] == pid:
@@ -65,7 +78,7 @@ def main() -> None:
         shell=True,
         start_new_session=False,
         stdout=subprocess.DEVNULL,
-        stderr=subprocess.STDOUT
+        stderr=subprocess.STDOUT,
     )
 
 
