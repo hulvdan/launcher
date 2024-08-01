@@ -50,7 +50,7 @@ def main() -> None:
     is_cpp = "cmakelists.txt" in (i.lower() for i in os.listdir(directory))
     print("IS_CPP={}".format(is_cpp))
     if is_cpp:
-        d = os.path.join(directory, "globalignore")
+        d = os.path.join(directory, ".globalignore")
         if not os.path.exists(d):
             os.mkdir(d)
 
