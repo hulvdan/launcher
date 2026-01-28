@@ -1,14 +1,14 @@
 import os
 import subprocess
-
-from win32 import win32api
-from win32 import win32process
-from win32 import win32gui
-
+import sys
 from glob import glob
+from pathlib import Path
 
 from iterfzf import iterfzf
+from win32 import win32api, win32gui, win32process
 
+DETACHED_PROCESS = 0x00000008
+CREATE_NEW_PROCESS_GROUP = 0x00000200
 
 HOME_PATH = os.path.expanduser(os.path.normpath("~/"))
 
@@ -43,11 +43,16 @@ def main() -> None:
         return
 
     directory = os.path.expanduser(selected_path)
-    command = 'wezterm.exe start --cwd "{}" -- '.format(directory)
+    command = 'wezterm.exe start --always-new-process --cwd "{}" -- '.format(directory)
 
-    cmd = "nvim ."
+    cmd = "nvim"
+    if (Path(directory) / "project.godot").exists():
+        cmd += " --listen 127.0.0.1:9696"
+    cmd += " ."
 
-    is_cpp = "cmakelists.txt" in (i.lower() for i in os.listdir(directory))
+    is_cpp = False
+    for filename in ("cmakelists.txt", "makefile"):
+        is_cpp |= filename in (i.lower() for i in os.listdir(directory))
     print("IS_CPP={}".format(is_cpp))
     if is_cpp:
         d = os.path.join(directory, ".globalignore")
@@ -57,9 +62,11 @@ def main() -> None:
         script_file_path = os.path.join(d, ".wezterm.temp.bat")
         with open(script_file_path, "w") as out_file:
             out_file.write(
-                r"""
+                rf"""
+call "c:\Users\user\dev\home\emsdk\emsdk.bat" activate latest
 call "c:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
-nvim ."""
+set EMSCRIPTEN=c:\Users\user\dev\home\emsdk\upstream\emscripten
+{cmd}"""
             )
 
         cmd = 'cmd /C "{}"'.format(script_file_path)
@@ -72,14 +79,23 @@ nvim ."""
 
     win32gui.EnumWindows(callback, os.getppid())
 
+    Path(r"c:\Users\user\Downloads\1.txt").write_text(command)
+
     print(directory, command)
+
+    directory_formatted = str(Path(directory).relative_to(Path(directory).parent))
+
     subprocess.Popen(
         command,
-        shell=True,
+        shell=False,
         start_new_session=False,
+        creationflags=DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP,
         stdout=subprocess.DEVNULL,
-        stderr=subprocess.STDOUT,
+        stderr=subprocess.DEVNULL,
+        stdin=subprocess.DEVNULL,
+        close_fds=True,
     )
+    sys.exit(0)
 
 
 if __name__ == "__main__":
