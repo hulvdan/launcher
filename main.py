@@ -46,7 +46,8 @@ def main() -> None:
     command = 'wezterm.exe start --always-new-process --cwd "{}" -- '.format(directory)
 
     cmd = "nvim"
-    if (Path(directory) / "project.godot").exists():
+    is_godot = (Path(directory) / "project.godot").exists()
+    if is_godot:
         cmd += " --listen 127.0.0.1:9696"
     cmd += " ."
 
@@ -54,7 +55,7 @@ def main() -> None:
     for filename in ("cmakelists.txt", "makefile"):
         is_cpp |= filename in (i.lower() for i in os.listdir(directory))
     print("IS_CPP={}".format(is_cpp))
-    if is_cpp:
+    if is_cpp or is_godot:
         d = os.path.join(directory, ".globalignore")
         if not os.path.exists(d):
             os.mkdir(d)
