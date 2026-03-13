@@ -1,14 +1,8 @@
-[tool.poetry]
+[project]
 name = "launcher"
 version = "0.1.0"
-description = ""
-authors = ["Aleksei Chistov <aleksey.chistov@gmail.com>"]
-
-[tool.poetry.dependencies]
-python = "^3.11"
-iterfzf = "^1.4.0.51.0"
-pywin32 = "^306"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires-python = ">=3.11.3"
+dependencies = [
+    "iterfzf>=1.9.0.67.0",
+    "pywin32>=311",
+]
