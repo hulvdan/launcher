@@ -1,3 +1,4 @@
+import sys
 import os
 import subprocess
 from glob import glob
@@ -48,7 +49,17 @@ def main() -> None:
 
     with open('_.bat', 'w', encoding='utf-8') as out_file:
         out_file.write(command)
-    subprocess.run('_.bat')
+    subprocess.Popen(
+        '_.bat',
+        shell=False,
+        start_new_session=False,
+        creationflags=DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        stdin=subprocess.DEVNULL,
+        close_fds=True,
+    )
+    sys.exit(0)
 
 
 if __name__ == "__main__":
