@@ -1,0 +1,17 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "1_gitf",
+      "type": "shell",
+      "command": "uv run python .vscode/cli.py gitf",
+      "icon": {
+        "id": "run"
+      },
+      "presentation": {
+        "reveal": "silent",
+        "clear": true
+      }
+    }
+  ]
+}

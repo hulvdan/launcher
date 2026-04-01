@@ -1,0 +1,15 @@
+{
+  "cSpell.words": [
+    "gdev"
+  ],
+  "runOnSave.commands": [
+    {
+      "match": "\\.json$",
+      "command": "prettier -w ${file}"
+    },
+    {
+      "match": "\\.pyi?$",
+      "command": "uv run ruff format ${file} && uv run ruff check --select I ${file} --fix"
+    }
+  ]
+}
